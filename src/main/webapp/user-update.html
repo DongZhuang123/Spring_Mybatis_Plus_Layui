@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html  xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <meta charset="UTF-8">
+    <title>用户修改</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport"
+          content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi"/>
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/>
+    <link rel="stylesheet" href="/layuii7/css/font.css">
+    <link rel="stylesheet" href="/layuii7/css/xadmin.css">
+    <script src="/layuii7/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/layuii7/js/xadmin.js"></script>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body layui-anim layui-anim-up" id="userid">
+    <form class="layui-form" lay-filter="formTest">
+        <input type="hidden" id="sid" name="sid">
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+                <span class="x-red">*</span>入职日期
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" name="datatime" class="layui-input" id="test1-1" placeholder="yyyy-MM-dd">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span class="x-red">*</span>这将会记录你的
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="L_username" class="layui-form-label">
+                <span class="x-red">*</span>姓名
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="L_username" name="sname" required lay-verify="nikename" autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-inline">
+            <label class="layui-form-label">部门</label>
+            <div class="layui-input-inline">
+                <select name="cid" id="selectid">
+                    <option th:each="stu:${lis}" th:value="${stu.cid}" th:selected="${stu.cid eq list.cid}" th:text="${stu.cname}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">单选框</label>
+            <div class="layui-input-block">
+                <input type="radio" name="ssex" th:value="${list.ssex}" th:checked="${list.ssex eq 'M'}" title="男">
+                <input type="radio" name="ssex" th:value="${list.ssex}" th:checked="${list.ssex eq 'F'}" title="女">
+            </div>
+        </div>
+
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">爱好</label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="shao" name="sahao" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" id="demo1" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </div>
+    </form>
+</div>
+<script src="/layui/layui.js" th:src="@{/layui/layui.js}" charset="utf-8"></script>
+<script>
+
+
+    layui.use(['form', 'layer', 'layedit', 'laydate', 'upload'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer
+            , layedit = layui.layedit
+            , laydate = layui.laydate,
+            upload = layui.upload
+
+        //国际版
+        laydate.render({
+            elem: '#test1-1'
+            , lang: 'en'
+        });
+
+        //自定义验证规则
+        form.verify({
+            nikename: function (value) {
+                if (value.length < 3) {
+                    return '昵称至少得5个字符啊';
+                }
+            }
+            , pass: [/(.+){6,12}$/, '密码必须6到12位']
+            , repass: function (value) {
+                if ($('#L_pass').val() != $('#L_repass').val()) {
+                    return '两次密码不一致';
+                }
+            }
+        });
+
+        //表单取值
+        layui.$('#demo1').on('click', function () {
+            var date = form.val('formTest');
+            alert(JSON.stringify(date))
+            $.post({
+                type: 'post',
+                data: JSON.stringify(date),
+                url: '/updateByid.do',
+                dataType: 'json',
+                contentType: 'application/json;charset=UTF-8',
+                success: function () {
+                    layer.msg("jinlail",{time:500000})
+                    //发异步，把数据提交给php
+                    layer.alert("增加成功", {icon: 6,time:500000}, function () {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                },error:function () {
+                  layer.alert("出出力")
+                }
+            });
+        });
+
+
+    });
+</script>
+</body>
+
+</html>
